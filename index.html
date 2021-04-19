@@ -108,7 +108,7 @@
 
       // Add item to cart
       if (event.target.matches('.add-item')) {
-        let item = store.searchProduct(parseInt(event.target.id)); // Controlar cuando  no encuentre el ID
+        let item = store.searchProduct(parseInt(event.target.id));
         store.addItem(item);
         counterCart.textContent = store.getCountItemsCart();
       };
