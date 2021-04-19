@@ -37,7 +37,7 @@ class Products extends HTMLElement {
 
     buildUrlAPI(value, search = false) {
 
-      let url = `${window.URL_BASE}products/`;
+      let url = `${window.API_URL_BASE}products/`;
       if (!search) {
         if (value !== 0) {
           url += `category/${value}`;

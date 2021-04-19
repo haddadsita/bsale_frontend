@@ -89,33 +89,42 @@
     store.setCategory();
 
     MIN_LENGTH_TEXT = 3;
-    URL_BASE = 'http://192.168.0.13:8001/api/';
 
+    API_URL_BASE = 'http://192.168.0.13:8001/api/';
+
+    // Selectors
     let productComponent = document.querySelector('v-products');
     let categoryComponent = document.querySelector('v-menu');
     let counterCart = document.getElementById('counter-items');
+    let inputSearch = document.getElementById('search');
+    
+    // Get counter items to cart
     counterCart.textContent = store.getCountItemsCart();
-
     productComponent.setAttribute('category', store.getCategory());
+
     /* Listener events */
+    inputSearch.addEventListener('input', search);
     document.addEventListener('click', function(event) {
 
+      // Add item to cart
       if (event.target.matches('.add-item')) {
         let item = store.searchProduct(parseInt(event.target.id)); // Controlar cuando  no encuentre el ID
         store.addItem(item);
         counterCart.textContent = store.getCountItemsCart();
       };
-      
+
+      // Search products by name
       if(event.target.matches('.search_category')){
         categoryComponent.setAttribute('category', event.target.id);
         productComponent.setAttribute('category', event.target.id);
       }
 
+      // Load items in cart
       if(event.target.matches('.show-cart')) {
         loadItemsCart();
       }
     })
-    
+
     function loadItemsCart() {
       let products = store.getCart();
       let contentCart = document.getElementById('content-products');
@@ -149,6 +158,9 @@
      loadItemsCart();
 
 
+    /*
+    * Methods for calculate data in cart
+    */
     function calculateSubTotalRow(product) {
       return parseInt(product.price) * parseInt(product.qty) - calculateDiscount(product.price, product.discount);
     }
@@ -164,10 +176,6 @@
       }
       return sum;
     }
-
-
-    const inputSearch = document.getElementById('search');
-    inputSearch.addEventListener('input', search)
 
     function search(event) {
       let value = event.srcElement.value;

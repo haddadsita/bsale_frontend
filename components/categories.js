@@ -21,7 +21,7 @@ class MenuCategories extends HTMLElement {
 
     getCategories() {
         return new Promise((res, rej) => {
-            fetch(`${window.URL_BASE}categories/`)
+            fetch(`${window.API_URL_BASE}categories/`)
                 .then(data => data.json())
                 .then((json) => {
                     this.render(this.menuHTML(json.data));
