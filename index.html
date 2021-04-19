@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./assets/styles.css" media="screen" />
+  <title>BSALE Challenge</title>
+</head>
+<body>
+  <nav>
+    <div class="nav-wrapper">
+      <a href="#" class="brand-logo name">Bsale Ecommerce</a>
+      <a class="modal-trigger "href="#modal1"><i class="small material-icons icon show-cart">add_shopping_cart</i>
+        <span id="counter-items" class="badge">0</span>
+      </a>
+      <form>
+        <div class="input-field search">
+          <input id="search" type="search" placeholder="Busca producto por su nombre..." required autocomplete="off">
+          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+    </div>
+  </nav>
+
+   <!-- Modal Structure -->
+   <div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4>Carrito De Compra</h4>
+      <div class="row">
+        <div class="col s2"><p>Imagen</p></div>
+        <div class="col s2"><p>Producto</p></div>
+        <div class="col s2"><p>Precio</p></div>
+        <div class="col s2"><p>Descuento</p></div>
+        <div class="col s2"><p>Cantidad</p></div>
+        <div class="col s2"><p>Sub Total</p></div>
+      </div>
+      <div id="content-products">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cerrar</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s2">
+      <v-menu category="4"></v-menu>
+    </div>
+    <div class="col s10">
+      <div class="row">
+        <v-products category="4" search=""></v-products>
+      </div>
+    </div>
+  </div>
+
+
+  <footer class="page-footer">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">BSale</h5>
+          <p class="grey-text text-lighten-4">Only for develop Challenge.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+        © 2021 Copyright Challenge BSale
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./store/store.js"></script>
+  <script>
+    // Initialize Materialize JS
+    M.AutoInit();
+
+    // Create store (LocalStorage)
+    store = new Store();
+    store.checkCart();
+    store.setCategory();
+
+    MIN_LENGTH_TEXT = 3;
+    URL_BASE = 'http://192.168.0.13:8001/api/';
+
+    let productComponent = document.querySelector('v-products');
+    let categoryComponent = document.querySelector('v-menu');
+    let counterCart = document.getElementById('counter-items');
+    counterCart.textContent = store.getCountItemsCart();
+
+    productComponent.setAttribute('category', store.getCategory());
+    /* Listener events */
+    document.addEventListener('click', function(event) {
+
+      if (event.target.matches('.add-item')) {
+        let item = store.searchProduct(parseInt(event.target.id)); // Controlar cuando  no encuentre el ID
+        store.addItem(item);
+        counterCart.textContent = store.getCountItemsCart();
+      };
+      
+      if(event.target.matches('.search_category')){
+        categoryComponent.setAttribute('category', event.target.id);
+        productComponent.setAttribute('category', event.target.id);
+      }
+
+      if(event.target.matches('.show-cart')) {
+        loadItemsCart();
+      }
+    })
+    
+    function loadItemsCart() {
+      let products = store.getCart();
+      let contentCart = document.getElementById('content-products');
+      contentCart.innerHTML = '';
+      for (const product of products) {
+          let image = product.url_image ? product.url_image : 'no-image.jpeg';
+          contentCart.innerHTML += `
+            <div class="row">
+              <div class="col s2"><img src="${image}" alt="image" width="50" height="50"/></div>
+              <div class="col s2"><p>${product.name}</p></div>
+              <div class="col s2"><p>${product.price}</p></div>
+              <div class="col s2"><p>${calculateDiscount(product.price , product.discount)}</p></div>
+              <div class="col s2"><p>1</p></div>
+              <div class="col s2"><p>${calculateSubTotalRow(product)}</p></div>
+            </div>
+          `;
+      }
+      contentCart.innerHTML += `
+          <div class="row">
+            <div class="col s2"></div>
+            <div class="col s2"></div>
+            <div class="col s2"></div>
+            <div class="col s2"></div>
+            <div class="col s2"><p>Total</p></div>
+            <div class="col s2"><p>${calculateTotal(products)}</p></div>
+          </div>
+        `;
+    }
+
+     // Load Cart
+     loadItemsCart();
+
+
+    function calculateSubTotalRow(product) {
+      return parseInt(product.price) * parseInt(product.qty) - calculateDiscount(product.price, product.discount);
+    }
+
+    function calculateDiscount(value, discount) {
+      return Math.floor(value*discount)/100;
+    }
+
+    function calculateTotal(products){
+      let sum = 0;
+      for (const product of products) {
+        sum += calculateSubTotalRow(product)
+      }
+      return sum;
+    }
+
+
+    const inputSearch = document.getElementById('search');
+    inputSearch.addEventListener('input', search)
+
+    function search(event) {
+      let value = event.srcElement.value;
+      if (value.length >= MIN_LENGTH_TEXT) {
+        productComponent.setAttribute('search', value);
+      } else {
+        productComponent.setAttribute('search', '');
+        productComponent.setAttribute('category', 0);
+        categoryComponent.setAttribute('category', 0);
+      }
+    }
+  </script>
+  <script src="./components/products.js"></script>
+  <script src="./components/categories.js"></script>
+</body>
+</html>
