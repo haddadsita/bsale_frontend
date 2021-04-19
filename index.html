@@ -130,7 +130,7 @@
       let contentCart = document.getElementById('content-products');
       contentCart.innerHTML = '';
       for (const product of products) {
-          let image = product.url_image ? product.url_image : 'no-image.jpeg';
+          let image = product.url_image ? product.url_image : 'assets/no-image.jpeg';
           contentCart.innerHTML += `
             <div class="row">
               <div class="col s2"><img src="${image}" alt="image" width="50" height="50"/></div>

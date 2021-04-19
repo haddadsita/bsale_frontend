@@ -87,7 +87,7 @@ class Products extends HTMLElement {
           data = data.filter(item => item.name.toLowerCase().includes(this.search.toLowerCase()))
         }
         for (const item of data) {
-            let image = item.url_image ? item.url_image : 'no-image.jpeg';
+            let image = item.url_image ? item.url_image : 'assets/no-image.jpeg';
             this.itemsProduct += `
                 <div class="col s3">
                     <div class="card">
