@@ -25,7 +25,7 @@ class MenuCategories extends HTMLElement {
                 {
                     method: 'GET',
                     headers: new Headers({'Content-type': 'application/json'}),
-                    mode: 'cors',
+                    mode: 'no-cors',
                 })
                 .then(data => data.json())
                 .then((json) => {
