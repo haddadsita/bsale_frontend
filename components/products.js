@@ -67,7 +67,12 @@ class Products extends HTMLElement {
 
     getProductsByNameData() {
       return new Promise((res, rej) => {
-          fetch(this.buildUrlAPI(this.search, true))
+          fetch(this.buildUrlAPI(this.search, true),
+            {
+              method: 'GET',
+              headers: new Headers({'Content-type': 'application/json'}),
+              mode: 'cors',
+            })
               .then(data => data.json())
               .then((json) => {
                   this.render(this.productsHTML(json.data));
